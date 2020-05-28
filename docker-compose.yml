@@ -1,0 +1,38 @@
+version: '3.4'
+
+services:
+  sqldata:
+    image : microsoft/mssql-server-windows-express:latest 
+  ocelotapigateway:
+    image: ${DOCKER_REGISTRY-}ocelotapigateway
+    restart: always
+    build:
+      context: .
+      dockerfile: OcelotApiGateway\Dockerfile
+    ports:
+      - "8086:80"
+  resourceapi:
+    image: ${DOCKER_REGISTRY-}resourceapi
+    restart: always
+    build:
+      context: .
+      dockerfile: ResourceAPI\Dockerfile
+    depends_on:
+      - sqldata 
+    ports:
+      - "8081:80"
+  identityapi:
+    image: ${DOCKER_REGISTRY-}identityapi
+    restart: always
+    build:
+      context: .
+      dockerfile: IdentityAPI\Dockerfile
+    depends_on:
+      - sqldata 
+    ports:
+      - "8082:80"
+ # consul:
+  #  image: consul:latest
+   # command: consul agent -dev -log-level=warn -ui -client=0.0.0.0
+ #   hostname: consul
+ #   container_name: consul
